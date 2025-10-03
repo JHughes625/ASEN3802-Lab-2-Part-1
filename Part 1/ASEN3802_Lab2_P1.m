@@ -96,6 +96,12 @@ hold off;
 figure
 plot(TC_Data(1,:),exp_LBF_1(:));
 
+for i=1:5
+[g(i,:),M(i),x_L] = M_exp(expData(i).values);
+
+end
+%M % M is here to check values to input into overleaf table.
+
 
 
 
