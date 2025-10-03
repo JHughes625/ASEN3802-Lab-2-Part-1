@@ -31,7 +31,10 @@ for j=1:length(expData) %TASK 2 Plotting
 figure()
 plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
 %plot(,,linewidth=1.3,color=[52/255, 144/255, 224/255]) %plot analytical initial conditions
-strTitle = expData(i).name +"Initial Condition Comp.";
+strTitle = expData(i).name +" Initial Condition Comp.";
 title(strTitle)
+xlabel("Dist From Th1 (m)")
+ylabel("Temp C")
+legend("Exp. LOBF IC", "Analytical IC")
 end
 %M % M is here to print values to input into overleaf table.
