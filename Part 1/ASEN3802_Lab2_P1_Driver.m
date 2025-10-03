@@ -26,8 +26,12 @@ for i=1:length(expData)
     [H_exp(i), H_an(i), LBF_exp(i), LBF_an(i), T_0(i)] = P1_SSTD(expData(i));
 end
 
-for i=1:5
-[g(i,:),M(i),x_L] = M_exp(expData(i).values);
-
+for j=1:length(expData) %TASK 2 Plotting
+[g(j,:),M(j),x_L] = M_exp(expData(j).values);
+figure()
+plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
+%plot(,,linewidth=1.3,color=[52/255, 144/255, 224/255]) %plot analytical initial conditions
+strTitle = expData(i).name +"Initial Condition Comp.";
+title(strTitle)
 end
-%M % M is here to check values to input into overleaf table.
+%M % M is here to print values to input into overleaf table.
