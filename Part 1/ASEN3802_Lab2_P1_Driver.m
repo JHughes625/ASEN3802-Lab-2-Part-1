@@ -25,3 +25,9 @@ end
 for i=1:length(expData)
     [H_exp(i), H_an(i), LBF_exp(i), LBF_an(i), T_0(i)] = P1_SSTD(expData(i));
 end
+
+for i=1:5
+[g(i,:),M(i),x_L] = M_exp(expData(i).values);
+
+end
+%M % M is here to check values to input into overleaf table.
