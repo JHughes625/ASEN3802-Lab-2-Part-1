@@ -1,5 +1,5 @@
 function [g, Mexp, l] = M_exp(expData)
-    l = linspace(0,8*0.0127); %making arbitrary xrange
+l = linspace(0,8*0.0127);
     initialVec = expData(1,2:9); %pulling initial values from expData
     T0 = initialVec(1);
     x = 1:length(initialVec); % creating thermocouples of space 1

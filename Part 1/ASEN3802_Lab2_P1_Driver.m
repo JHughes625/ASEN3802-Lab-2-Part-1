@@ -138,24 +138,24 @@ legend('[An]','[Exp]');
 hold off
 
 for j=1:length(expData) %TASK 2 Plotting
-[g(j,:),M(j),x_L] = M_exp(expData(j).values);
+[g(j,:),M(j),x_L] = M_exp(expData(j).values); %run Mexp function
 figure()
 hold on
 plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
 plot(TC_Positions - TC_Positions(1),expData(j).values(1,2:9),'kx') % overlay the data
-yline(T_0(i),linewidth=1.3,color=[52/255, 144/255, 224/255])
+yline(T_0(i),linewidth=1.3,color=[52/255, 144/255, 224/255]) %plotting an IC
 ax = gca;  % get current axes handle
 xlimits = ax.XLim; 
 ylimits = ax.YLim;
-xlim([xlimits(1)-0.01, xlimits(2)+0.01])
+xlim([xlimits(1)-0.01, xlimits(2)+0.01]) %fixing the bounds of plot
 ylim([ylimits(1)-0.1, ylimits(2)+0.1])
-strTitle = expData(j).name +" Initial Condition Comp.";
-strTitleSave = "PlotIC_"+expData(j).name ;
+strTitle = expData(j).name +" Initial Condition Comp."; %iterateable title
+strTitleSave = "PlotIC_"+expData(j).name ; %iteratable filename
 title(strTitle, 'interpreter', 'none')
 xlabel("Dist From Th1 (m)")
 ylabel("Temp C")
 legend("Exp. LOBF IC", "Exp. Data", "Analytical IC", location='best')
 hold off
-saveas(gcf,strTitleSave,'png')
+saveas(gcf,strTitleSave,'png') %save the produced plots as pngs
 end
 %M % M is here to print values to input into overleaf table.
