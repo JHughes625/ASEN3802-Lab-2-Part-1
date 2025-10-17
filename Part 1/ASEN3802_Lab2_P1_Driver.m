@@ -175,7 +175,8 @@ for i=1:10
     u2(i) = T_0(1) + H_an(1)*x + b*sin(lam*x)*exp(-1*lam^2 * alph * t2);
     n(i) = i;
 end
-u(1) = T_0(1) + H_an(1)*x;
+u1(1) = T_0(1) + H_an(1)*x;
+u2(1) = T_0(1) + H_an(1)*x;
 figure()
 hold on
 plot(n,u1, 'b',linewidth=1.2)
@@ -198,6 +199,6 @@ Fo2 = alph*t2/L_Rod^2;
 %     u2 = u2 + uc2;
 % end
 
-
+[t,u] = part2Models(H_an(1),k_Aluminum,rho_Aluminum,cp_Aluminum,T_0(1),L_Rod);
 
 
