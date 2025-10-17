@@ -68,94 +68,136 @@ end
 
 %% Plots & Tables
 
-outputTable = table(T_0,H_an,H_exp)
+% outputTable = table(T_0,H_an,H_exp);
+% 
+% figure
+% hold on;
+% plot(expData(1).values(:,1), expData(1).values(:,2));
+% plot(expData(1).values(:,1), expData(1).values(:,3));
+% plot(expData(1).values(:,1), expData(1).values(:,4));
+% plot(expData(1).values(:,1), expData(1).values(:,5));
+% plot(expData(1).values(:,1), expData(1).values(:,6));
+% plot(expData(1).values(:,1), expData(1).values(:,7));
+% plot(expData(1).values(:,1), expData(1).values(:,8));
+% plot(expData(1).values(:,1), expData(1).values(:,9));
+% xlabel('Time [s]');
+% ylabel('Temperature [C]')
+% title('Aluminum 25V 240mA Thermocouple');
+% legend('Thermocouple 1', 'Thermocouple 2', 'Thermocouple 3', 'Thermocouple 4', ...
+%     'Thermocouple 5', 'Thermocouple 6', 'Thermocouple 7', 'Thermocouple 8');
+% hold off;
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,1));
+% plot(TC_Positions,LBF_exp(:,1));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Aluminum 25V 240mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,2));
+% plot(TC_Positions,LBF_exp(:,2));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Aluminum  30V 290mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,3));
+% plot(TC_Positions,LBF_exp(:,3));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Brass  25V 237mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,4));
+% plot(TC_Positions,LBF_exp(:,4));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Brass  30V 285mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,5));
+% plot(TC_Positions,LBF_exp(:,5));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Steel 22V 203mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
 
-figure
-hold on;
-plot(expData(1).values(:,1), expData(1).values(:,2));
-plot(expData(1).values(:,1), expData(1).values(:,3));
-plot(expData(1).values(:,1), expData(1).values(:,4));
-plot(expData(1).values(:,1), expData(1).values(:,5));
-plot(expData(1).values(:,1), expData(1).values(:,6));
-plot(expData(1).values(:,1), expData(1).values(:,7));
-plot(expData(1).values(:,1), expData(1).values(:,8));
-plot(expData(1).values(:,1), expData(1).values(:,9));
-xlabel('Time [s]');
-ylabel('Temperature [C]')
-title('Aluminum 25V 240mA Thermocouple');
-legend('Thermocouple 1', 'Thermocouple 2', 'Thermocouple 3', 'Thermocouple 4', ...
-    'Thermocouple 5', 'Thermocouple 6', 'Thermocouple 7', 'Thermocouple 8');
-hold off;
+% for j=1:length(expData) %TASK 2 Plotting
+% [g(j,:),M(j),x_L] = M_exp(expData(j).values); %run Mexp function
+% figure()
+% hold on
+% plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
+% plot(TC_Positions - TC_Positions(1),expData(j).values(1,2:9),'kx') % overlay the data
+% yline(T_0(i),linewidth=1.3,color=[52/255, 144/255, 224/255]) %plotting an IC
+% ax = gca;  % get current axes handle
+% xlimits = ax.XLim; 
+% ylimits = ax.YLim;
+% xlim([xlimits(1)-0.01, xlimits(2)+0.01]) %fixing the bounds of plot
+% ylim([ylimits(1)-0.1, ylimits(2)+0.1])
+% strTitle = expData(j).name +" Initial Condition Comp."; %iterateable title
+% strTitleSave = "PlotIC_"+expData(j).name ; %iteratable filename
+% title(strTitle, 'interpreter', 'none')
+% xlabel("Dist From Th1 (m)")
+% ylabel("Temp C")
+% legend("Exp. LOBF IC", "Exp. Data", "Analytical IC", location='best')
+% hold off
+% saveas(gcf,strTitleSave,'png') %save the produced plots as pngs
+% end
+% %M % M is here to print values to input into overleaf table.
 
-figure
-hold on
-plot(TC_Positions,LBF_an(:,1));
-plot(TC_Positions,LBF_exp(:,1));
-xlabel('Position [m]');
-ylabel('Temperature [C]')
-title('Aluminum 25V 240mA SSTD Comparison');
-legend('[An]','[Exp]');
-hold off
+%% Part 2
 
-figure
-hold on
-plot(TC_Positions,LBF_an(:,2));
-plot(TC_Positions,LBF_exp(:,2));
-xlabel('Position [m]');
-ylabel('Temperature [C]')
-title('Aluminum  30V 290mA SSTD Comparison');
-legend('[An]','[Exp]');
-hold off
-
-figure
-hold on
-plot(TC_Positions,LBF_an(:,3));
-plot(TC_Positions,LBF_exp(:,3));
-xlabel('Position [m]');
-ylabel('Temperature [C]')
-title('Brass  25V 237mA SSTD Comparison');
-legend('[An]','[Exp]');
-hold off
-
-figure
-hold on
-plot(TC_Positions,LBF_an(:,4));
-plot(TC_Positions,LBF_exp(:,4));
-xlabel('Position [m]');
-ylabel('Temperature [C]')
-title('Brass  30V 285mA SSTD Comparison');
-legend('[An]','[Exp]');
-hold off
-
-figure
-hold on
-plot(TC_Positions,LBF_an(:,5));
-plot(TC_Positions,LBF_exp(:,5));
-xlabel('Position [m]');
-ylabel('Temperature [C]')
-title('Steel 22V 203mA SSTD Comparison');
-legend('[An]','[Exp]');
-hold off
-
-for j=1:length(expData) %TASK 2 Plotting
-[g(j,:),M(j),x_L] = M_exp(expData(j).values); %run Mexp function
+t1 = 1;
+t2 = 1000;
+% this for loops is simply to demonstrate that the model converges with
+% finite n
+for i=1:10
+    x = 0.0127*8;
+    b = -8*H_an(1)*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
+    lam = (2*i-1)*pi/(2*L_Rod);
+    alph = k_Aluminum/rho_Aluminum/cp_Aluminum;
+    u1(i) = T_0(1) + H_an(1)*x + b*sin(lam*x)*exp(-1*lam^2 * alph * t1);
+    u2(i) = T_0(1) + H_an(1)*x + b*sin(lam*x)*exp(-1*lam^2 * alph * t2);
+    n(i) = i;
+end
+u(1) = T_0(1) + H_an(1)*x;
 figure()
 hold on
-plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
-plot(TC_Positions - TC_Positions(1),expData(j).values(1,2:9),'kx') % overlay the data
-yline(T_0(i),linewidth=1.3,color=[52/255, 144/255, 224/255]) %plotting an IC
-ax = gca;  % get current axes handle
-xlimits = ax.XLim; 
-ylimits = ax.YLim;
-xlim([xlimits(1)-0.01, xlimits(2)+0.01]) %fixing the bounds of plot
-ylim([ylimits(1)-0.1, ylimits(2)+0.1])
-strTitle = expData(j).name +" Initial Condition Comp."; %iterateable title
-strTitleSave = "PlotIC_"+expData(j).name ; %iteratable filename
-title(strTitle, 'interpreter', 'none')
-xlabel("Dist From Th1 (m)")
-ylabel("Temp C")
-legend("Exp. LOBF IC", "Exp. Data", "Analytical IC", location='best')
+plot(n,u1, 'b',linewidth=1.2)
+plot(n,u2, 'r',linewidth=1.2)
+xlabel('n')
+ylabel('u')
+title("u(x,t) Approximated to n=50")
+legend("t=1s","t=1000s")
 hold off
-saveas(gcf,strTitleSave,'png') %save the produced plots as pngs
-end
-%M % M is here to print values to input into overleaf table.
+
+Fo1 = alph*t1/L_Rod^2;
+Fo2 = alph*t2/L_Rod^2;
+% for i=1:10
+%     b = -8*H_an()*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
+%     lam = (2*i-1)*pi/(2*L_Rod);
+%     alph = 
+%     uc1 = T0 + Hx + b*sin(lam*x)*exp(-1*lam^2 * alph * t1);
+%     u1 = u1 + uc1;
+%     uc2 = T0 + Hx + b*sin(lam*x)*exp(-1*lam^2 * alph * t2);
+%     u2 = u2 + uc2;
+% end
+
+
+
+
