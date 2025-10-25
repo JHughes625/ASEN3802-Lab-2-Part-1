@@ -1,0 +1,19 @@
+function [t, u] = part2Models(Han,k,rho,cp,T_0,L_Rod,tend)
+    x = .0127:0.0127:8*.0127;
+    t = 1:.1:tend;
+    u = 0;
+    for n=1:length(t)
+        for j=1:length(x)
+            for i=1:10
+                b = -8*Han*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
+                lam = (2*i-1)*pi/(2*L_Rod);
+                alph = k/rho/cp;
+                if i-1 == 0
+                    u(j,n,i) = b*sin(lam*x(j))*exp(-1*lam^2 * alph * t(n));
+                else
+                    u(j,n,i) = b*sin(lam*x(j))*exp(-1*lam^2 * alph * t(n)) + u(j,n,i-1);
+                end
+            end
+        end
+    end
+end

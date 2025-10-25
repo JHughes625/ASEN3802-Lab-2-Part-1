@@ -161,44 +161,65 @@ end
 % %M % M is here to print values to input into overleaf table.
 
 %% Part 2
-
+Han = [91.1,132.1,101.7,146.7,544.1];
+T0 = [17.1,17.2,16.5,16.8,15.1];
+Hexp = [55.2,79.1,105.4,150.3,287.1];
 t1 = 1;
 t2 = 1000;
 % this for loops is simply to demonstrate that the model converges with
 % finite n
+% This is task 1!
+u1 = 0;
+u2 = 0;
 for i=1:10
     x = 0.0127*8;
-    b = -8*H_an(1)*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
+    b(i) = -8*Han(1)*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
     lam = (2*i-1)*pi/(2*L_Rod);
     alph = k_Aluminum/rho_Aluminum/cp_Aluminum;
-    u1(i) = T_0(1) + H_an(1)*x + b*sin(lam*x)*exp(-1*lam^2 * alph * t1);
-    u2(i) = T_0(1) + H_an(1)*x + b*sin(lam*x)*exp(-1*lam^2 * alph * t2);
+    if i-1 == 0
+        u1(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t1);
+        u2(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t2);
+    else
+        u1(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t1) + u1(i-1);
+        u2(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t2) + u2(i-1);
+    end
     n(i) = i;
 end
-u1(1) = T_0(1) + H_an(1)*x;
-u2(1) = T_0(1) + H_an(1)*x;
+u1 = u1+ T0(1) + Han(1)*x;
+u2 = u2 + T0(1) + Han(1)*x;
 figure()
 hold on
 plot(n,u1, 'b',linewidth=1.2)
 plot(n,u2, 'r',linewidth=1.2)
 xlabel('n')
 ylabel('u')
-title("u(x,t) Approximated to n=50")
+title("u(x,t) Approximated to n=10")
 legend("t=1s","t=1000s")
 hold off
-
+saveas(gcf,'part2task1plot','png')
 Fo1 = alph*t1/L_Rod^2;
 Fo2 = alph*t2/L_Rod^2;
-% for i=1:10
-%     b = -8*H_an()*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
-%     lam = (2*i-1)*pi/(2*L_Rod);
-%     alph = 
-%     uc1 = T0 + Hx + b*sin(lam*x)*exp(-1*lam^2 * alph * t1);
-%     u1 = u1 + uc1;
-%     uc2 = T0 + Hx + b*sin(lam*x)*exp(-1*lam^2 * alph * t2);
-%     u2 = u2 + uc2;
-% end
 
-[t,u] = part2Models(H_an(1),k_Aluminum,rho_Aluminum,cp_Aluminum,T_0(1),L_Rod);
-
-
+% this is for task 2
+kvec = [k_Aluminum,k_Aluminum,k_Brass,k_Brass,k_Steel];
+cpvec = [cp_Aluminum,cp_Aluminum,cp_Brass,cp_Brass,cp_Steel];
+rhovec = [rho_Aluminum,rho_Aluminum,rho_Brass,rho_Brass,rho_Steel];
+figure()
+hold on
+for i=1:5
+    [t,u] = part2Models(Han(i),kvec(i),rhovec(i),cpvec(i),T0(i),L_Rod,expData(i).values(end-2,1));
+    subplot(3,2,i)
+    for j=1:height(u)
+        hold on
+        h1 = plot(t,u(j,:,end),color=[240, 67, 67]/255,linewidth=1.2);
+        h2 = plot(expData(i).values(:,1),expData(i).values(:,j+1),color=[61,84,179]/255,linewidth=1.2);
+        hold off
+    end
+    strTitle = expData(i).name +"'s u vs t"; %iterateable title
+    title(strTitle, 'interpreter', 'none')   
+    xlabel('Time (s)')
+    ylabel('Temperature (C)')
+end
+legend(([h1,h2]),'Analytical Data', 'Experimental Data','Position',[0.568706595682436 0.270159257433763 0.09778645987312 0.0436185477568589])
+hold off
+saveas(gcf,'part2task2subplot','png')
