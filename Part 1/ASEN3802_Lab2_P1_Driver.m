@@ -191,10 +191,13 @@ figure()
 hold on
 plot(n,u1, 'b',linewidth=1.2)
 plot(n,u2, 'r',linewidth=1.2)
+ax = gca;  % get current axes handle
+ylimits = ax.YLim;
+ylim([ylimits(1)-0.1, ylimits(2)+0.1])
 xlabel('n')
 ylabel('u')
 title("u(x,t) Approximated to n=10")
-legend("t=1s","t=1000s")
+legend("t=1s","t=1000s",'Location','East')
 hold off
 saveas(gcf,'part2task1plot','png')
 Fo1 = alph*t1/L_Rod^2;
@@ -215,11 +218,36 @@ for i=1:5
         h2 = plot(expData(i).values(:,1),expData(i).values(:,j+1),color=[61,84,179]/255,linewidth=1.2);
         hold off
     end
-    strTitle = expData(i).name +"'s u vs t"; %iterateable title
+    strTitle = expData(i).name +"'s u vs t - H_{an}"; %iterateable title
     title(strTitle, 'interpreter', 'none')   
     xlabel('Time (s)')
     ylabel('Temperature (C)')
 end
 legend(([h1,h2]),'Analytical Data', 'Experimental Data','Position',[0.568706595682436 0.270159257433763 0.09778645987312 0.0436185477568589])
 hold off
-saveas(gcf,'part2task2subplot','png')
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+set(gcf,'PaperPositionMode','auto');
+print(gcf, 'part2task2output.png', '-dpng', '-r300');
+
+% this is task 3
+figure()
+hold on
+for i=1:5
+    [t,u] = part2Models(Hexp(i),kvec(i),rhovec(i),cpvec(i),T0(i),L_Rod,expData(i).values(end-2,1));
+    subplot(3,2,i)
+    for j=1:height(u)
+        hold on
+        h1 = plot(t,u(j,:,end),color=[240, 67, 67]/255,linewidth=1.2);
+        h2 = plot(expData(i).values(:,1),expData(i).values(:,j+1),color=[61,84,179]/255,linewidth=1.2);
+        hold off
+    end
+    strTitle = expData(i).name +"'s u vs t - H_{exp}"; %iterateable title
+    title(strTitle, 'interpreter', 'none')   
+    xlabel('Time (s)')
+    ylabel('Temperature (C)')
+end
+legend(([h1,h2]),'Analytical Data', 'Experimental Data','Position',[0.568706595682436 0.270159257433763 0.09778645987312 0.0436185477568589])
+hold off
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+set(gcf,'PaperPositionMode','auto');
+print(gcf, 'part2task3output.png', '-dpng', '-r300');
