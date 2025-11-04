@@ -1,0 +1,251 @@
+clear all;
+clc;
+close all;
+% Heat Conduction Lab
+% Contributor(s): 
+% Jackson Hughes
+% Grant Bechtel
+% Course: ASEN3802
+% Date: 10/5/2025
+
+
+data_Files = dir('*mA');
+
+for i=1:length(data_Files)
+    b = strsplit(data_Files(i).name,'_'); % gives a cell array (b) that is 1x3
+    % {'material','voltsV','ampsmA'} -- now split by 'V' and 'mA'
+    v = strsplit(b{2},'V'); % volts are always in the second portion
+    ampval = strsplit(b{3},'mA'); % amps are always in the third portion
+    volts(i) = str2num(v{1}); % convert string to number (vector)
+    amps(i) = str2num(ampval{1});
+    content_Files = readmatrix(data_Files(i).name);
+
+    % read data into a struct
+    expData(i).name = data_Files(i).name;
+    expData(i).volts = volts(i);
+    expData(i).amps = amps(i);
+    expData(i).values = content_Files;
+    clear content_Files;
+end
+clear b ampval v i data_Files volts amps content_Files;
+%% Material Properties
+in_to_m = 0.0254;
+
+rho_Aluminum = 2810; % kg/m^3
+rho_Brass = 8500; 
+rho_Steel = 8000; 
+
+cp_Aluminum = 960; % J/(kg*K)
+cp_Brass = 380; 
+cp_Steel = 500; 
+
+k_Aluminum = 130; % W/(m*K)
+k_Brass = 115;
+k_Steel = 16.2;
+
+%% Experimental Data
+
+x_0 = (1 + (3/8)) * in_to_m; % m
+radius_Rod = 0.5 * in_to_m; % m
+area_Rod = radius_Rod^2 * pi; % m^2
+L_Rod = x_0 + (0.5 * in_to_m * 7) + (1 * in_to_m); % m 
+TC_Positions = [
+    x_0 ...
+    (x_0 + 1*(0.5 * in_to_m)) ...
+    (x_0 + 2*(0.5 * in_to_m)) ...
+    (x_0 + 3*(0.5 * in_to_m)) ...
+    (x_0 + 4*(0.5 * in_to_m)) ...
+    (x_0 + 5*(0.5 * in_to_m)) ...
+    (x_0 + 6*(0.5 * in_to_m)) ...
+    (x_0 + 7*(0.5 * in_to_m)) ...
+    ];
+
+for i=1:length(expData)
+    [H_exp(i), LBF_exp(:,i), H_an(i), LBF_an(:,i), T_0(i)] = P1_SSTD(expData(i));
+end
+
+
+
+%% Plots & Tables
+
+% outputTable = table(T_0,H_an,H_exp);
+% 
+% figure
+% hold on;
+% plot(expData(1).values(:,1), expData(1).values(:,2));
+% plot(expData(1).values(:,1), expData(1).values(:,3));
+% plot(expData(1).values(:,1), expData(1).values(:,4));
+% plot(expData(1).values(:,1), expData(1).values(:,5));
+% plot(expData(1).values(:,1), expData(1).values(:,6));
+% plot(expData(1).values(:,1), expData(1).values(:,7));
+% plot(expData(1).values(:,1), expData(1).values(:,8));
+% plot(expData(1).values(:,1), expData(1).values(:,9));
+% xlabel('Time [s]');
+% ylabel('Temperature [C]')
+% title('Aluminum 25V 240mA Thermocouple');
+% legend('Thermocouple 1', 'Thermocouple 2', 'Thermocouple 3', 'Thermocouple 4', ...
+%     'Thermocouple 5', 'Thermocouple 6', 'Thermocouple 7', 'Thermocouple 8');
+% hold off;
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,1));
+% plot(TC_Positions,LBF_exp(:,1));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Aluminum 25V 240mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,2));
+% plot(TC_Positions,LBF_exp(:,2));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Aluminum  30V 290mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,3));
+% plot(TC_Positions,LBF_exp(:,3));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Brass  25V 237mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,4));
+% plot(TC_Positions,LBF_exp(:,4));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Brass  30V 285mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+% 
+% figure
+% hold on
+% plot(TC_Positions,LBF_an(:,5));
+% plot(TC_Positions,LBF_exp(:,5));
+% xlabel('Position [m]');
+% ylabel('Temperature [C]')
+% title('Steel 22V 203mA SSTD Comparison');
+% legend('[An]','[Exp]');
+% hold off
+
+% for j=1:length(expData) %TASK 2 Plotting
+% [g(j,:),M(j),x_L] = M_exp(expData(j).values); %run Mexp function
+% figure()
+% hold on
+% plot(x_L,g(j,:),linewidth=1.3,color=[224/255, 115/255, 52/255])%plot exp. IC via LOBF
+% plot(TC_Positions - TC_Positions(1),expData(j).values(1,2:9),'kx') % overlay the data
+% yline(T_0(i),linewidth=1.3,color=[52/255, 144/255, 224/255]) %plotting an IC
+% ax = gca;  % get current axes handle
+% xlimits = ax.XLim; 
+% ylimits = ax.YLim;
+% xlim([xlimits(1)-0.01, xlimits(2)+0.01]) %fixing the bounds of plot
+% ylim([ylimits(1)-0.1, ylimits(2)+0.1])
+% strTitle = expData(j).name +" Initial Condition Comp."; %iterateable title
+% strTitleSave = "PlotIC_"+expData(j).name ; %iteratable filename
+% title(strTitle, 'interpreter', 'none')
+% xlabel("Dist From Th1 (m)")
+% ylabel("Temp C")
+% legend("Exp. LOBF IC", "Exp. Data", "Analytical IC", location='best')
+% hold off
+% saveas(gcf,strTitleSave,'png') %save the produced plots as pngs
+% end
+% %M % M is here to print values to input into overleaf table.
+
+%% Part 2
+Han = [91.1,132.1,101.7,146.7,544.1];
+
+T0 = [17.1,17.2,16.5,16.8,15.1];
+Hexp = [55.2,79.1,105.4,150.3,287.1];
+t1 = 1;
+t2 = 1000;
+% this for loops is simply to demonstrate that the model converges with
+% finite n
+% This is task 1!
+u1 = 0;
+u2 = 0;
+for i=1:10
+    x = 0.0127*8;
+    b(i) = -8*Hexp(1)*L_Rod*(((-1)^(i+1))/(pi*pi*(2*i-1)^2));
+    lam = (2*i-1)*pi/(2*L_Rod);
+    alph = k_Aluminum/rho_Aluminum/cp_Aluminum;
+    if i-1 == 0
+        u1(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t1);
+        u2(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t2);
+    else
+        u1(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t1) + u1(i-1);
+        u2(i) = b(i)*sin(lam*x)*exp(-1*lam^2 * alph * t2) + u2(i-1);
+    end
+    n(i) = i;
+end
+u1 = u1+ T0(1) + Hexp(1)*x;
+u2 = u2 + T0(1) + Hexp(1)*x;
+figure()
+hold on
+plot(n,u1, 'b',linewidth=1.2)
+plot(n,u2, 'r',linewidth=1.2)
+xlabel('n')
+ylabel('u')
+title("u(x,t) Approximated to n=10")
+legend("t=1s","t=1000s")
+hold off
+%saveas(gcf,'part2task1plot','png')
+Fo1 = alph*t1/L_Rod^2;
+Fo2 = alph*t2/L_Rod^2;
+
+%% Graphing
+% this is for task 2
+kvec = [k_Aluminum,k_Aluminum,k_Brass,k_Brass,k_Steel];
+cpvec = [cp_Aluminum,cp_Aluminum,cp_Brass,cp_Brass,cp_Steel];
+rhovec = [rho_Aluminum,rho_Aluminum,rho_Brass,rho_Brass,rho_Steel];
+figure()
+hold on
+for i=1:5
+    alpha_An(i) = kvec(i)/ (cpvec(i) * rhovec(i));
+    alpha_Exp(i).values = part3Alpha(Hexp(i),T_0(i),L_Rod,expData(i).volts,expData(i).amps,expData(i).values(:,:),kvec(i),cpvec(i),rhovec(i));% * 10^-5;
+    [t_modelIII,u_modelIII] = part2Models(Hexp(i),alpha_Exp(i).values,T_0(i),L_Rod,expData(i).values(end-2,1));
+    [t_modelII,u_modelII] = part2Models(Hexp(i),(kvec(i)/(rhovec(i)*cpvec(i))),T_0(i),L_Rod,expData(i).values(end-2,1));
+    [t_modelIa,u_modelIa] = part2Models(Han(i),(kvec(i)/(rhovec(i)*cpvec(i))),16,L_Rod,expData(i).values(end-2,1));
+    [t_modelIb,u_modelIb] = part2Models(Hexp(i),(kvec(i)/(rhovec(i)*cpvec(i))),16,L_Rod,expData(i).values(end-2,1));
+
+    [polycoeff_u_P3(i,:),P3_error(i,:)] = polyfit(expData(i).values(:,1),expData(i).values(:,8), 3);
+    [polycoeff_u_P3_output,P3_delta] = polyval(polycoeff_u_P3(i,:),expData(i).values(:,1),P3_error(i,:));
+    %expData_std(:) = std(expData(i).values(8,:));
+    subplot(3,2,i)
+
+        hold on
+        h1_III = plot(t_modelIII,u_modelIII(8,:,end),color='k',linewidth=1.0);
+        h1_II = plot(t_modelII,u_modelII(8,:,end),color='g',linewidth=1.0);
+        h1_Ia = plot(t_modelIa,u_modelIa(8,:,end),color='m',linewidth=1.0);
+        h1_Ib = plot(t_modelIb,u_modelIb(8,:,end),color='r',linewidth=1.0);
+
+        h2 = plot(expData(i).values(:,1),expData(i).values(:,8),color=[61,84,179]/255,linewidth=1.2);
+        h2_Error_Upper = plot(expData(i).values(:,1),expData(i).values(:,8) + P3_delta,'m--',color=[61,84,179]/255,linewidth=1.0);
+        h2_Error_Lower = plot(expData(i).values(:,1),expData(i).values(:,8) - P3_delta,'m--',color=[61,84,179]/255,linewidth=1.0);
+        hold off
+        %clear polycoeff_u_P3 polycoeff_u_P3_output P3_delta P3_error
+    strTitle = expData(i).name +"'s u vs t"; %iterateable title
+    title(strTitle, 'interpreter', 'none')   
+    xlabel('Time (s)')
+    ylabel('Temperature (C)')
+end
+legend(([h1_III,h1_II,h1_Ia,h1_Ib,h2]),'Model III','Model II','Model Ia','Model Ib', ...
+    'Experimental Data','Position',[0.568706595682436 0.270159257433763 0.09778645987312 0.0436185477568589])
+hold off
+%saveas(gcf,'part2task2subplot','png')
+%disp(alpha_An);
+%disp(alpha_Exp);
+
+t_ss = [500 500 1000 1000 6000];
+
+for i = 1:5
+    Fo_adj(i) = (alpha_Exp(i).values .* t_ss(i)) ./ (5.875 .* in_to_m).^2;
+end
