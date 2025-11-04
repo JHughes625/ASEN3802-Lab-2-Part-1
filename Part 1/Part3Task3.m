@@ -216,8 +216,8 @@ for i=1:5
     [t_modelIa,u_modelIa] = part2Models(Han(i),(kvec(i)/(rhovec(i)*cpvec(i))),16,L_Rod,expData(i).values(end-2,1));
     [t_modelIb,u_modelIb] = part2Models(Hexp(i),(kvec(i)/(rhovec(i)*cpvec(i))),16,L_Rod,expData(i).values(end-2,1));
 
-    [polycoeff_u_P3(i,:),P3_error(i,:)] = polyfit(expData(i).values(:,1),expData(i).values(:,8), 3);
-    [polycoeff_u_P3_output,P3_delta] = polyval(polycoeff_u_P3(i,:),expData(i).values(:,1),P3_error(i,:));
+    [polycoeff_u_P3(i).values,P3_error(i).values] = polyfit(expData(i).values(1:end-2,1),expData(i).values(1:end-2,8), 3);
+    [polycoeff_u_P3_output(i).values,P3_delta(i).values] = polyval(polycoeff_u_P3(i).values,expData(i).values(1:end-2,1),P3_error(i).values);
     %expData_std(:) = std(expData(i).values(8,:));
     subplot(3,2,i)
 
@@ -228,8 +228,8 @@ for i=1:5
         h1_Ib = plot(t_modelIb,u_modelIb(8,:,end),color='r',linewidth=1.0);
 
         h2 = plot(expData(i).values(:,1),expData(i).values(:,8),color=[61,84,179]/255,linewidth=1.2);
-        h2_Error_Upper = plot(expData(i).values(:,1),expData(i).values(:,8) + P3_delta,'m--',color=[61,84,179]/255,linewidth=1.0);
-        h2_Error_Lower = plot(expData(i).values(:,1),expData(i).values(:,8) - P3_delta,'m--',color=[61,84,179]/255,linewidth=1.0);
+        h2_Error_Upper = plot(expData(i).values(1:end-2,1),expData(i).values(1:end-2,8) + P3_delta(i).values,'m--',color=[61,84,179]/255,linewidth=1.0);
+        h2_Error_Lower = plot(expData(i).values(1:end-2,1),expData(i).values(1:end-2,8) - P3_delta(i).values,'m--',color=[61,84,179]/255,linewidth=1.0);
         hold off
         %clear polycoeff_u_P3 polycoeff_u_P3_output P3_delta P3_error
     strTitle = expData(i).name +"'s u vs t"; %iterateable title
@@ -244,7 +244,19 @@ hold off
 %disp(alpha_An);
 %disp(alpha_Exp);
 
-t_ss = [500 500 1000 1000 6000];
+t_ss = [1540 1640 2270 2620 7010];
+flag_sstd = 0;
+for i = 1:5
+    exp_sstd(i).values = diff(polycoeff_u_P3_output(i).values);
+    for j = 1:length(exp_sstd(i).values)
+        
+        if exp_sstd(i).values(j) < 0.001 && flag_sstd == 0
+           t_steady(i) = expData(i).values(j,1);
+           flag_sstd = 1;
+        end
+    end
+    flag_sstd = 0;
+end
 
 for i = 1:5
     Fo_adj(i) = (alpha_Exp(i).values .* t_ss(i)) ./ (5.875 .* in_to_m).^2;
